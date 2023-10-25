@@ -1,0 +1,41 @@
+{
+  "manifest_version": 2,
+  "name": "browser-extension-boilerplate",
+  "version": "0.0.1",
+  "description": "A browser extension boilerplate with React, TypeScript, Vite and Tailwind CSS",
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "background": {
+    "scripts": [
+      "src/pages/background/index.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "<all_urls>"
+      ],
+      "js": [
+        "src/pages/content/index.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/js/*.js",
+        "assets/css/*.css"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "src/pages/popup/index.html"
+  }
+}
