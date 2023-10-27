@@ -1,6 +1,6 @@
+import type { Plugin } from "vite";
 import { writeFileSync } from "fs";
 import { resolve } from "path";
-import { Plugin } from "vite";
 
 import { ensureDirectoryExists } from "../../helpers/fs";
 import { ManifestParser } from "./parser";
@@ -12,17 +12,15 @@ interface PluginOptions {
   manifestV3File: ManifestV3;
 }
 
-export function convertManifestToString(
-  manifest: ManifestV3 | ManifestV2
-): string {
-  return JSON.stringify(manifest, null, 2);
-}
-
 export const manifestFileName = "manifest.json";
 export const manifestV3FileName = "manifest.v3.json";
 export const manifestV2FileName = "manifest.v2.json";
 
-export function manifestTransform(options: PluginOptions): Plugin {
+export function transformManifest(options: PluginOptions): Plugin {
+  function convertManifestToString(manifest: ManifestV3 | ManifestV2): string {
+    return JSON.stringify(manifest, null, 2);
+  }
+
   const { isDev, distDir, manifestV3File, publicDir } = options;
 
   function createManifestPath(dir: string, fileName: string) {
@@ -65,5 +63,3 @@ export function manifestTransform(options: PluginOptions): Plugin {
     },
   };
 }
-
-export default manifestTransform;

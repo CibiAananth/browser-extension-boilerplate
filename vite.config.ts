@@ -2,7 +2,7 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-import manifestTransform from "./utils/plugins/manifest-transform";
+import { transformManifest } from "./utils/plugins/manifest-transform";
 import { duplicateBuild } from "./utils/plugins/duplicate-build";
 
 import { manifest as manifestV3File } from "./manifest";
@@ -13,7 +13,7 @@ const pagesDir = resolve(srcDir, "pages");
 const distDir = resolve(rootDir, "dist");
 const publicDir = resolve(rootDir, "public");
 
-const isDev = process.env.__DEV__ === "true";
+const isDev = process.env.NODE_ENV === "development";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -24,7 +24,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    manifestTransform({ isDev, manifestV3File, distDir, publicDir }),
+    transformManifest({ isDev, manifestV3File, distDir, publicDir }),
     duplicateBuild(distDir),
   ],
   publicDir,
@@ -34,7 +34,6 @@ export default defineConfig({
     emptyOutDir: true,
     sourcemap: isDev,
     minify: !isDev,
-
     rollupOptions: {
       input: {
         content: resolve(pagesDir, "content/index.ts"),
@@ -48,7 +47,12 @@ export default defineConfig({
         chunkFileNames: isDev
           ? "assets/js/[name].js"
           : "assets/js/[name].[hash].js",
-        assetFileNames: `assets/[ext]/[name].chunk.[ext]`,
+        assetFileNames: (chunkInfo) => {
+          if (chunkInfo.name === "index.css") {
+            return `assets/css/[name].css`;
+          }
+          return `assets/[ext]/[name].[hash].[ext]`;
+        },
       },
     },
   },

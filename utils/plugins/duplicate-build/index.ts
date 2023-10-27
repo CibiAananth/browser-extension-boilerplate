@@ -8,7 +8,7 @@ import {
 } from "../manifest-transform";
 
 export function duplicateBuild(distPath: string): Plugin {
-  const tempPath = resolve(__dirname, "temp");
+  const tempPath = resolve(__dirname, "../../../tmp.local");
 
   return {
     name: "duplicate-build",
