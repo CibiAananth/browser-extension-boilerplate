@@ -1,8 +1,7 @@
 import type { Plugin } from "vite";
-import { writeFileSync } from "fs";
+import { ensureDir, outputFile } from "fs-extra";
 import { resolve } from "path";
 
-import { ensureDirectoryExists } from "../../helpers/fs";
 import { ManifestParser } from "./parser";
 
 interface PluginOptions {
@@ -27,36 +26,39 @@ export function transformManifest(options: PluginOptions): Plugin {
     return resolve(dir, fileName);
   }
 
-  function writeManifest(filePath: string, manifest: ManifestV3 | ManifestV2) {
-    writeFileSync(filePath, convertManifestToString(manifest), "utf-8");
+  async function writeManifest(
+    filePath: string,
+    manifest: ManifestV3 | ManifestV2
+  ) {
+    await outputFile(filePath, convertManifestToString(manifest), "utf-8");
   }
 
   return {
     name: "manifest-transform-plugin",
     apply: "build",
-    buildStart() {
+    async buildStart() {
       if (isDev) {
-        ensureDirectoryExists(distDir);
-        writeManifest(
+        await ensureDir(distDir);
+        await writeManifest(
           createManifestPath(distDir, manifestV3FileName),
           manifestV3File
         );
-        writeManifest(
+        await writeManifest(
           createManifestPath(distDir, manifestV2FileName),
           ManifestParser.transformToManifestV2(manifestV3File)
         );
       }
     },
-    buildEnd() {
+    async buildEnd() {
       if (isDev) {
         return;
       }
-      ensureDirectoryExists(publicDir);
-      writeManifest(
+      await ensureDir(publicDir);
+      await writeManifest(
         createManifestPath(publicDir, manifestV3FileName),
         manifestV3File
       );
-      writeManifest(
+      await writeManifest(
         createManifestPath(publicDir, manifestV2FileName),
         ManifestParser.transformToManifestV2(manifestV3File)
       );
