@@ -26,5 +26,11 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "utils", "vite.config.ts", "node_modules/@types"]
+  "include": [
+    "src",
+    "utils",
+    "vite.config.ts",
+    "node_modules/@types",
+    "utils/helpers/hmr/rollup.config.ts"
+  ]
 }

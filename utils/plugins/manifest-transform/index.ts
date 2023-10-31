@@ -1,19 +1,20 @@
-import type { Plugin } from "vite";
-import { ensureDir, outputFile } from "fs-extra";
-import { resolve } from "path";
+import { resolve } from 'path';
 
-import { ManifestParser } from "./parser";
+import { ensureDir, outputFile } from 'fs-extra';
+import type { Plugin } from 'vite';
 
-interface PluginOptions {
+import { ManifestParser } from './parser';
+
+type PluginOptions = {
   isDev: boolean;
   distDir: string;
   publicDir: string;
   manifestV3File: ManifestV3;
-}
+};
 
-export const manifestFileName = "manifest.json";
-export const manifestV3FileName = "manifest.v3.json";
-export const manifestV2FileName = "manifest.v2.json";
+export const manifestFileName = 'manifest.json';
+export const manifestV3FileName = 'manifest.v3.json';
+export const manifestV2FileName = 'manifest.v2.json';
 
 export function transformManifest(options: PluginOptions): Plugin {
   function convertManifestToString(manifest: ManifestV3 | ManifestV2): string {
@@ -28,24 +29,24 @@ export function transformManifest(options: PluginOptions): Plugin {
 
   async function writeManifest(
     filePath: string,
-    manifest: ManifestV3 | ManifestV2
+    manifest: ManifestV3 | ManifestV2,
   ) {
-    await outputFile(filePath, convertManifestToString(manifest), "utf-8");
+    await outputFile(filePath, convertManifestToString(manifest), 'utf-8');
   }
 
   return {
-    name: "manifest-transform-plugin",
-    apply: "build",
+    name: 'manifest-transform-plugin',
+    apply: 'build',
     async buildStart() {
       if (isDev) {
         await ensureDir(distDir);
         await writeManifest(
           createManifestPath(distDir, manifestV3FileName),
-          manifestV3File
+          manifestV3File,
         );
         await writeManifest(
           createManifestPath(distDir, manifestV2FileName),
-          ManifestParser.transformToManifestV2(manifestV3File)
+          ManifestParser.transformToManifestV2(manifestV3File),
         );
       }
     },
@@ -56,11 +57,11 @@ export function transformManifest(options: PluginOptions): Plugin {
       await ensureDir(publicDir);
       await writeManifest(
         createManifestPath(publicDir, manifestV3FileName),
-        manifestV3File
+        manifestV3File,
       );
       await writeManifest(
         createManifestPath(publicDir, manifestV2FileName),
-        ManifestParser.transformToManifestV2(manifestV3File)
+        ManifestParser.transformToManifestV2(manifestV3File),
       );
     },
   };
